@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prueba de API Skill-Match</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .endpoint-section {
+        flex: 1;
+        min-width: 300px;
+        margin: 10px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      h2 {
+        margin-top: 0;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        margin: 5px 0;
+        border-radius: 4px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin: 5px 0;
+        box-sizing: border-box;
+      }
+      pre {
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        min-height: 100px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .token-info {
+        font-size: 12px;
+        color: #666;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Prueba de API Skill-Match</h1>
+    <p>Esta página te permite probar los endpoints de la API de Skill-Match.</p>
+
+    <div class="token-info">
+      <strong>Token JWT almacenado:</strong>
+      <span id="stored-token">Ninguno</span>
+    </div>
+
+    <div class="container">
+      <!-- AUTENTICACIÓN -->
+      <div class="endpoint-section">
+        <h2>Autenticación</h2>
+
+        <h3>Registro</h3>
+        <input type="email" id="register-email" placeholder="Email" />
+        <input
+          type="password"
+          id="register-password"
+          placeholder="Contraseña"
+        />
+        <select id="register-role">
+          <option value="freelancer">Freelancer</option>
+          <option value="employer">Empleador</option>
+        </select>
+        <button onclick="register()">Registrar</button>
+        <pre id="register-response"></pre>
+
+        <h3>Login</h3>
+        <input type="email" id="login-email" placeholder="Email" />
+        <input type="password" id="login-password" placeholder="Contraseña" />
+        <button onclick="login()">Iniciar Sesión</button>
+        <pre id="login-response"></pre>
+
+        <h3>Usuario Actual</h3>
+        <button onclick="getCurrentUser()">Obtener Usuario Actual</button>
+        <pre id="current-user-response"></pre>
+      </div>
+
+      <!-- PERFIL FREELANCER -->
+      <div class="endpoint-section">
+        <h2>Perfil Freelancer</h2>
+
+        <h3>Obtener Perfil</h3>
+        <button onclick="getProfile()">Obtener Mi Perfil</button>
+        <pre id="get-profile-response"></pre>
+
+        <h3>Crear Perfil</h3>
+        <textarea id="profile-bio" placeholder="Biografía"></textarea>
+        <input
+          type="text"
+          id="profile-picture"
+          placeholder="URL de Imagen de Perfil"
+        />
+        <input type="number" id="profile-rate" placeholder="Tarifa por hora" />
+        <button onclick="createProfile()">Crear Perfil</button>
+        <pre id="create-profile-response"></pre>
+
+        <h3>Actualizar Perfil</h3>
+        <textarea id="update-bio" placeholder="Nueva Biografía"></textarea>
+        <input
+          type="text"
+          id="update-picture"
+          placeholder="Nueva URL de Imagen"
+        />
+        <input
+          type="number"
+          id="update-rate"
+          placeholder="Nueva Tarifa por hora"
+        />
+        <button onclick="updateProfile()">Actualizar Perfil</button>
+        <pre id="update-profile-response"></pre>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="endpoint-section">
+        <h2>Skills</h2>
+
+        <h3>Listar Skills</h3>
+        <button onclick="listSkills()">Obtener Skills</button>
+        <pre id="skills-response"></pre>
+
+        <h3>Crear Skill (Admin)</h3>
+        <input type="text" id="skill-name" placeholder="Nombre de Skill" />
+        <button onclick="createSkill()">Crear Skill</button>
+        <pre id="create-skill-response"></pre>
+
+        <h3>Agregar Skills a Freelancer</h3>
+        <input
+          type="text"
+          id="skill-ids"
+          placeholder="IDs de Skills (separados por coma)"
+        />
+        <button onclick="addFreelancerSkills()">Agregar Skills</button>
+        <pre id="add-skills-response"></pre>
+
+        <h3>Eliminar Skill de Freelancer</h3>
+        <input type="number" id="remove-skill-id" placeholder="ID de Skill" />
+        <button onclick="removeFreelancerSkill()">Eliminar Skill</button>
+        <pre id="remove-skill-response"></pre>
+      </div>
+
+      <!-- PROYECTOS -->
+      <div class="endpoint-section">
+        <h2>Proyectos</h2>
+
+        <h3>Listar Proyectos</h3>
+        <button onclick="listProjects()">Obtener Proyectos</button>
+        <pre id="projects-response"></pre>
+
+        <h3>Crear Proyecto (Empleador)</h3>
+        <input type="text" id="project-title" placeholder="Título" />
+        <textarea id="project-description" placeholder="Descripción"></textarea>
+        <input type="text" id="project-category" placeholder="Categoría" />
+        <input type="number" id="project-budget" placeholder="Presupuesto" />
+        <input
+          type="text"
+          id="project-deadline"
+          placeholder="Fecha límite (YYYY-MM-DD)"
+        />
+        <button onclick="createProject()">Crear Proyecto</button>
+        <pre id="create-project-response"></pre>
+
+        <h3>Obtener Proyecto</h3>
+        <input type="number" id="get-project-id" placeholder="ID de Proyecto" />
+        <button onclick="getProject()">Obtener Proyecto</button>
+        <pre id="get-project-response"></pre>
+      </div>
+
+      <!-- PROPUESTAS -->
+      <div class="endpoint-section">
+        <h2>Propuestas</h2>
+
+        <h3>Enviar Propuesta (Freelancer)</h3>
+        <input
+          type="number"
+          id="proposal-project-id"
+          placeholder="ID de Proyecto"
+        />
+        <textarea id="proposal-message" placeholder="Mensaje"></textarea>
+        <input
+          type="number"
+          id="proposal-budget"
+          placeholder="Presupuesto propuesto"
+        />
+        <button onclick="submitProposal()">Enviar Propuesta</button>
+        <pre id="submit-proposal-response"></pre>
+
+        <h3>Listar Propuestas para Proyecto (Empleador)</h3>
+        <input
+          type="number"
+          id="list-proposals-project-id"
+          placeholder="ID de Proyecto"
+        />
+        <button onclick="listProjectProposals()">Listar Propuestas</button>
+        <pre id="project-proposals-response"></pre>
+
+        <h3>Mis Propuestas (Freelancer)</h3>
+        <button onclick="getMyProposals()">Obtener Mis Propuestas</button>
+        <pre id="my-proposals-response"></pre>
+      </div>
+
+      <!-- ADMIN -->
+      <div class="endpoint-section">
+        <h2>Admin</h2>
+
+        <h3>Listar Usuarios (Admin)</h3>
+        <button onclick="listUsers()">Obtener Usuarios</button>
+        <pre id="users-response"></pre>
+      </div>
+    </div>
+
+    <script>
+      // La URL base de la API
+      const API_URL =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+          ? "http://localhost:3001/api"
+          : "/api";
+
+      let token = localStorage.getItem("jwt_token");
+      updateTokenDisplay();
+
+      // Función para actualizar la visualización del token
+      function updateTokenDisplay() {
+        const tokenDisplay = document.getElementById("stored-token");
+        if (token) {
+          tokenDisplay.textContent = token.substring(0, 20) + "...";
+        } else {
+          tokenDisplay.textContent = "Ninguno";
+        }
+      }
+
+      // Función genérica para realizar solicitudes a la API
+      async function apiRequest(endpoint, method = "GET", data = null) {
+        const headers = {
+          "Content-Type": "application/json",
+        };
+
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const options = {
+          method,
+          headers,
+          credentials: "include",
+        };
+
+        if (data) {
+          options.body = JSON.stringify(data);
+        }
+
+        try {
+          const response = await fetch(`${API_URL}${endpoint}`, options);
+          const responseData = await response.json();
+          return {
+            status: response.status,
+            data: responseData,
+          };
+        } catch (error) {
+          return {
+            status: 500,
+            data: { msg: error.message },
+          };
+        }
+      }
+
+      // Función para mostrar respuestas en los elementos pre
+      function displayResponse(elementId, response) {
+        document.getElementById(elementId).textContent = JSON.stringify(
+          response,
+          null,
+          2
+        );
+      }
+
+      // ------ Funciones de Autenticación ------
+
+      async function register() {
+        const email = document.getElementById("register-email").value;
+        const password = document.getElementById("register-password").value;
+        const role = document.getElementById("register-role").value;
+
+        const data = { email, password, role };
+        const response = await apiRequest("/register", "POST", data);
+        displayResponse("register-response", response);
+      }
+
+      async function login() {
+        const email = document.getElementById("login-email").value;
+        const password = document.getElementById("login-password").value;
+
+        const data = { email, password };
+        const response = await apiRequest("/login", "POST", data);
+        displayResponse("login-response", response);
+
+        if (response.status === 200 && response.data.access_token) {
+          token = response.data.access_token;
+          localStorage.setItem("jwt_token", token);
+          updateTokenDisplay();
+        }
+      }
+
+      async function getCurrentUser() {
+        const response = await apiRequest("/users/me");
+        displayResponse("current-user-response", response);
+      }
+
+      // ------ Funciones de Perfil Freelancer ------
+
+      async function getProfile() {
+        const response = await apiRequest("/freelancer/profile");
+        displayResponse("get-profile-response", response);
+      }
+
+      async function createProfile() {
+        const bio = document.getElementById("profile-bio").value;
+        const profilePicture = document.getElementById("profile-picture").value;
+        const hourlyRate = document.getElementById("profile-rate").value;
+
+        const data = {
+          bio,
+          profile_picture: profilePicture,
+          hourly_rate: parseFloat(hourlyRate),
+          rating: 0,
+        };
+
+        const response = await apiRequest("/freelancer/profile", "POST", data);
+        displayResponse("create-profile-response", response);
+      }
+
+      async function updateProfile() {
+        const bio = document.getElementById("update-bio").value;
+        const profilePicture = document.getElementById("update-picture").value;
+        const hourlyRate = document.getElementById("update-rate").value;
+
+        const data = {};
+        if (bio) data.bio = bio;
+        if (profilePicture) data.profile_picture = profilePicture;
+        if (hourlyRate) data.hourly_rate = parseFloat(hourlyRate);
+
+        const response = await apiRequest("/freelancer/profile", "PATCH", data);
+        displayResponse("update-profile-response", response);
+      }
+
+      // ------ Funciones de Skills ------
+
+      async function listSkills() {
+        const response = await apiRequest("/skills");
+        displayResponse("skills-response", response);
+      }
+
+      async function createSkill() {
+        const name = document.getElementById("skill-name").value;
+        const data = { name };
+
+        const response = await apiRequest("/skills", "POST", data);
+        displayResponse("create-skill-response", response);
+      }
+
+      async function addFreelancerSkills() {
+        const skillIds = document
+          .getElementById("skill-ids")
+          .value.split(",")
+          .map((id) => parseInt(id.trim()))
+          .filter((id) => !isNaN(id));
+
+        const data = { skill_ids: skillIds };
+        const response = await apiRequest("/freelancer/skills", "POST", data);
+        displayResponse("add-skills-response", response);
+      }
+
+      async function removeFreelancerSkill() {
+        const skillId = document.getElementById("remove-skill-id").value;
+        const response = await apiRequest(
+          `/freelancer/skills/${skillId}`,
+          "DELETE"
+        );
+        displayResponse("remove-skill-response", response);
+      }
+
+      // ------ Funciones de Proyectos ------
+
+      async function listProjects() {
+        const response = await apiRequest("/projects");
+        displayResponse("projects-response", response);
+      }
+
+      async function createProject() {
+        const title = document.getElementById("project-title").value;
+        const description = document.getElementById(
+          "project-description"
+        ).value;
+        const category = document.getElementById("project-category").value;
+        const budget = document.getElementById("project-budget").value;
+        const deadline = document.getElementById("project-deadline").value;
+
+        const data = {
+          title,
+          description,
+          category,
+          budget: parseFloat(budget),
+          deadline,
+        };
+
+        const response = await apiRequest("/projects", "POST", data);
+        displayResponse("create-project-response", response);
+      }
+
+      async function getProject() {
+        const projectId = document.getElementById("get-project-id").value;
+        const response = await apiRequest(`/projects/${projectId}`);
+        displayResponse("get-project-response", response);
+      }
+
+      // ------ Funciones de Propuestas ------
+
+      async function submitProposal() {
+        const projectId = document.getElementById("proposal-project-id").value;
+        const message = document.getElementById("proposal-message").value;
+        const proposedBudget = document.getElementById("proposal-budget").value;
+
+        const data = {
+          message,
+          proposed_budget: parseFloat(proposedBudget),
+        };
+
+        const response = await apiRequest(
+          `/projects/${projectId}/proposals`,
+          "POST",
+          data
+        );
+        displayResponse("submit-proposal-response", response);
+      }
+
+      async function listProjectProposals() {
+        const projectId = document.getElementById(
+          "list-proposals-project-id"
+        ).value;
+        const response = await apiRequest(`/projects/${projectId}/proposals`);
+        displayResponse("project-proposals-response", response);
+      }
+
+      async function getMyProposals() {
+        const response = await apiRequest("/freelancer/proposals");
+        displayResponse("my-proposals-response", response);
+      }
+
+      // ------ Funciones de Admin ------
+
+      async function listUsers() {
+        const response = await apiRequest("/admin/users");
+        displayResponse("users-response", response);
+      }
+    </script>
+  </body>
+</html>
