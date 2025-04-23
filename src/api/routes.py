@@ -37,7 +37,7 @@ def login():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Credenciales inválidas"}), 401
 
-    return jsonify(user=user.serialize())<Route path="/demo" element={<Demo />} />
+    return jsonify(user=user.serialize())
 
 
 
