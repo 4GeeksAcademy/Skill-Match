@@ -1,8 +1,13 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import db, User, Profile, Skill, FreelancerSkill, Project, Proposal
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 
 routes = Blueprint('routes', __name__)
+api = Blueprint('api', __name__)
+
+bcrypt = Bcrypt()
 
 # --- AUTENTICACIÓN ---
 
@@ -15,36 +20,84 @@ def register():
     role = data.get('role')
 
     if not email or not password or role not in ['freelancer', 'employer']:
-        return jsonify({"msg": "Datos inválidos"}), 400
+        return jsonify({"msg": "Rellena todos los campos"}), 400
 
-    if User.query.filter_by(email=email).first():
-        return jsonify({"msg": "Correo ya registrado"}), 409
+    user = User.query.filter_by(email=email).first()
 
-    hashed_pw = generate_password_hash(password)
-    user = User(email=email, password=hashed_pw, role=role)
-    db.session.add(user)
+    if user:
+        return jsonify({'msg': 'este email ya esta registrado'}), 400
+
+    password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    new_user = User(email=email, password=password_hash, role=role)
+
+    db.session.add(new_user)
     db.session.commit()
-    return jsonify(user.serialize()), 201
+
+    user_id = new_user.id
+    access_token = create_access_token(identity=str(user_id))
+
+    return jsonify({**new_user.serialize(), "access_token": access_token}), 201
 
 
 @routes.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    email = data.get('email')
-    password = data.get('password')
 
-    user = User.query.filter_by(email=email).first()
-    if not user or not check_password_hash(user.password, password):
-        return jsonify({"msg": "Credenciales inválidas"}), 401
+    email = request.json.get('email')
+    password = request.json.get('password')
 
-    return jsonify(user=user.serialize())
+    if not email or not password:
+        return jsonify({'msg': 'error en email o password'}), 400
+
+    current_user = User.query.filter_by(email=email).first()
+
+    if not current_user:
+        return jsonify({'msg': 'usuario no existe'}), 404
+
+    pass_db = current_user.password
+    true_or_false = bcrypt.check_password_hash(pass_db, password)
+
+    if true_or_false:
+
+        user_id = current_user.id
+        access_token = create_access_token(
+            identity=str(user_id))
+
+        return jsonify({
+            "msg": "Sesion iniciada",
+            "access_token": access_token,
+            "email": email
+        }), 200
+
+    else:
+        return jsonify({"msg": "Usuario o contraseña invalido."}), 401
 
 
+@api.route('/private', methods=["GET"])
+@jwt_required()
+def home():
 
- 
+    current_user_id = get_jwt_identity()
+
+    if current_user_id:
+        users = User.query.all()
+        user_list = []
+        for user in users:
+            user_act = {
+                "id": user.id,
+                "email": user.email,
+                "is_active": user.is_active
+            }
+            user_list.append(user_act)
+
+        return jsonify({"users": user_list}), 200
+
+    else:
+        return jsonify({"Error": "Error al iniciar sesion"}), 401
+
  # generar route para obtener el usuario todos los usuarios
 
- 
+
 # --- USUARIO ACTUAL ---
 
 @routes.route('/users/me', methods=['GET'])

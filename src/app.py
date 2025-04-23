@@ -12,6 +12,9 @@ from api.models import db
 from api.routes import routes
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+
 
 # from models import Person
 
@@ -29,6 +32,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = 'super-secret-key-for-testing'
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600  # 1 hora
+bcrypt = Bcrypt(app)
 
 # Flask-CORS
 CORS(app)
