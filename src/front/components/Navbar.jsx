@@ -20,7 +20,7 @@ export const Navbar = () => {
 						<button className="btn btn btn-outline-dark" type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
 					</form>
 					<div>
-						<Link to="/demo">
+						<Link to="/Login">
 							<button type="button" class="btn btn-dark px-4 py-2 me-2">Log in</button>
 						</Link>
 						<Link to="/Register">

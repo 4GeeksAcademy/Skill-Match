@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -12,8 +11,6 @@ const Register = () => {
         age: '',
         error: ''
     });
-
-    const history = useHistory();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -155,7 +152,7 @@ const Register = () => {
                                     />
                                 </div>
 
-                                <button type="submit" className="btn btn-primary w-100">
+                                <button type="submit" className="btn btn-dark w-100">
                                     Registrarse
                                 </button>
                             </form>
