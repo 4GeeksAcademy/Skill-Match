@@ -7,8 +7,12 @@ routes = Blueprint('routes', __name__)
 # --- AUTENTICACIÓN ---
 
 
-@api.route('/hello', methods=['GET'])
-def handle_users():
+@routes.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+    role = data.get('role')
 
     if not email or not password or role not in ['freelancer', 'employer']:
         return jsonify({"msg": "Datos inválidos"}), 400
@@ -33,7 +37,7 @@ def login():
     if not user or not check_password_hash(user.password, password):
         return jsonify({"msg": "Credenciales inválidas"}), 401
 
-    return jsonify(user=user.serialize())
+    return jsonify(user=user.serialize())<Route path="/demo" element={<Demo />} />
 
 
 
